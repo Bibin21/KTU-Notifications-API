@@ -89,7 +89,7 @@ $.ajax({
  
   for(let i=0;i< data.content.length;i++)
   {
-    const d = new Date(data.content[0].announcementDate);
+    const d = new Date(data.content[i].announcementDate);
     document.getElementById('notification').innerHTML+=`<div class="accordion"> <div style="margin-bottom:10px;font-family:poppinsbold;font-size:15px;">  ${data.content[i].subject} </div> <div style="color:brown;display:flex;align-items:center">
       <svg width="20px" height="20px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" stroke="#a42a2a" transform="matrix(1, 0, 0, 1, 0, 0)">
 
