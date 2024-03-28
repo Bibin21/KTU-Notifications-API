@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="./jquery.js"></script> 
+
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KTU Notifications API</title>
+</head>
+<body style="background-color: beige;"> 
+        <h1 style="text-align: center;">Notifications</h1>
+        <div  id="notification">
+
+
+    </div>
+</body>
+</html>
+
+<script>
+    
+    function download(element)
+{
+
+//     $.ajaxSetup({
+//   beforeSend:function(jqXHR,settings){
+//     if (settings.dataType === 'binary'){
+//       settings.xhr().responseType='arraybuffer';
+//       settings.processData=false;
+//     }
+//   }
+// })
+
+//     $.ajax({
+//   type: 'POST',
+//   data: JSON.stringify({ encryptId: element}),
+//     dataType:"json",
+//     contentType: "application/json",
+//   url: 'https://api.ktu.edu.in/ktu-web-portal-api/anon/getAttachment',
+
+//   success: function (data, status, xhr) {
+//     var file = new Blob([data], {type: 'application/pdf'});
+//        var fileURL = URL.createObjectURL(file);
+//        console.log(file);
+//        window.open(fileURL);
+//   }
+  
+// });
+
+var xhr = new XMLHttpRequest();
+xhr.open('POST', 'https://api.ktu.edu.in/ktu-web-portal-api/anon/getAttachment', true);
+xhr.setRequestHeader("Content-Type", "application/json;");
+xhr.onload = function() {
+    // window.open("data:application/pdf;base64," + Base64.encode(xhr.response));
+    // var file = new Blob([ xhr.response.split("==&&")[0]], {type: 'application/pdf;base64'});
+       const link = document.createElement('a');
+       link.width="1500px";
+       link.height="1000px";
+       var filtered=xhr.response.split("=")[0];
+       if(typeof filtered != 'undefined')
+       {
+     
+link.href ="data:application/pdf;base64,"+filtered.split("&")[0];
+link.download=xhr.response.split("&&")[1];
+       }
+else
+{
+
+link.href ="data:application/pdf;base64,"+xhr.response.split("&")[0];
+link.download=xhr.response.split("&&")[1];
+}
+ link.click();
+};
+
+xhr.send(JSON.stringify({ encryptId: element}));
+
+
+}
+
+$.ajax({
+  type: 'POST',
+  data: JSON.stringify({number:0,size: 10,searchText:""}),
+    dataType:"json",
+    contentType: "application/json;",
+  url: 'https://api.ktu.edu.in/ktu-web-portal-api/anon/announcemnts',
+
+  success: function (data, status, xhr) {
+
+  for(let i=0;i< data.content.length;i++)
+  {
+    document.getElementById('notification').innerHTML+=`<button class="accordion">Date: ${data.content[i].announcementDate.replace(/00:00:00/,'')}  <span style="margin-left:10px;background-color:white"> ${data.content[i].subject} <span> </button> <div class="panel">
+  <p>${data.content[i].message==null? "No Message" : data.content[i].message }</p>
+  ${data.content[i].attachmentList[0] !=null ? "<button onclick=\"download(this.value)\" value="+data.content[i].attachmentList[0].encryptId+" "+"style='margin-bottom:10px;'>Download Notification</button>" : "" } 
+</div><br> `;
+  }
+
+  var acc = document.getElementsByClassName("accordion");
+var i;
+
+for (i = 0; i < acc.length; i++) {
+  acc[i].addEventListener("click", function() {
+ 
+    this.classList.toggle("active");
+    var panel = this.nextElementSibling;
+    if (panel.style.maxHeight) {
+      panel.style.maxHeight = null;
+    } else {
+      panel.style.maxHeight = panel.scrollHeight + "px";
+    }
+  });
+}
+  }
+  
+});
+
+
+
+
+</script>
+
+<style>
+
+.accordion {
+  background-color: #eee;
+  color: #444;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  text-align: left;
+  border: none;
+  outline: none;
+  transition: 0.4s;
+}
+
+.active, .accordion:hover {
+  background-color: #ccc;
+}
+.panel {
+  padding: 0 18px;
+  background-color: white;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.2s ease-out;
+}
+
+.accordion:after {
+  content: '\02795'; 
+  font-size: 13px;
+  color: #777;
+  float: right;
+  margin-left: 5px;
+}
+
+.active:after {
+  content: "\2796"; 
+}
+</style>
